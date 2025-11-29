@@ -4,9 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TikTok Downloader</title>
+    
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" type="image/png">
+
     <style>
         body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f0f2f5; margin: 0; }
         .container { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        
+        /* Добавим логотип и внутрь страницы для красоты */
+        .logo { width: 60px; height: 60px; margin-bottom: 10px; }
+        
         h1 { color: #333; margin-bottom: 1.5rem; }
         input { width: 100%; padding: 12px; margin-bottom: 1rem; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
         button { width: 100%; padding: 12px; background-color: #fe2c55; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
@@ -17,14 +24,16 @@
 <body>
 
 <div class="container">
-    <h1>Скачать TikTok</h1>
+    <img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" alt="TikTok Logo" class="logo">
+    
+    <h1>Скачать видео TikTok без водяного знака</h1>
     
     <form action="/download" method="POST">
         <input type="text" name="url" placeholder="Вставьте ссылку..." required>
-        <button type="submit">Скачать Видео</button>
+        <button type="submit">Скачать видео</button>
     </form>
 
-    <p class="note">После нажатия подождите 5-10 секунд, пока видео загрузится.</p>
+    <p class="note">ожидайте 5-10 секунд, и видео начнёт скачиваться</p>
 </div>
 
 </body>
