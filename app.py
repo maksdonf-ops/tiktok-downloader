@@ -13,9 +13,13 @@ def download_tiktok_video(url):
         os.remove(DOWNLOAD_FILE)
 
     ydl_opts = {
-        'outtmpl': DOWNLOAD_FILE, # Сохраняем под именем video.mp4
+        'outtmpl': DOWNLOAD_FILE,
         'format': 'best',
         'quiet': True,
+        # Добавляем маскировку под настоящий браузер Chrome
+        'http_headers': {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        }
     }
     
     try:
