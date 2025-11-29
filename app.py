@@ -1,68 +1,58 @@
-from flask import Flask, render_template, request, jsonify, send_file
+
+from flask import Flask, render_template, request, send_file
 import yt_dlp
 import os
+import time
 
 app = Flask(__name__)
 
-# Путь к файлу, который мы будем скачивать
+# Имя файла делаем динамическим, чтобы не было конфликтов
 DOWNLOAD_FILE = 'video.mp4'
 
-def download_tiktok_video(url):
-    # Если старый файл есть, удаляем его, чтобы не мешал
-    if os.path.exists(DOWNLOAD_FILE):
-        os.remove(DOWNLOAD_FILE)
-
+def download_video(url):
+    # Опции с маскировкой под браузер Chrome
     ydl_opts = {
         'outtmpl': DOWNLOAD_FILE,
         'format': 'best',
         'quiet': True,
-        # Добавляем маскировку под настоящий браузер Chrome
         'http_headers': {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
         }
     }
     
+    # Удаляем старый файл перед скачиванием
+    if os.path.exists(DOWNLOAD_FILE):
+        os.remove(DOWNLOAD_FILE)
+
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            # Внимание: здесь download=True, мы реально скачиваем файл на диск
-            info = ydl.extract_info(url, download=True)
-            title = info.get('title', 'video')
-            return {'status': 'success', 'title': title}
+            ydl.extract_info(url, download=True)
+            return True
     except Exception as e:
-        return {'status': 'error', 'message': str(e)}
+        print(f"Ошибка: {e}")
+        return False
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/api/process', methods=['POST'])
-def process_video():
-    data = request.json
-    tiktok_url = data.get('url')
+@app.route('/download', methods=['POST'])
+def download_route():
+    # Получаем ссылку из формы (input name="url")
+    tiktok_url = request.form.get('url')
     
     if not tiktok_url:
-        return jsonify({'status': 'error', 'message': 'Ссылка не найдена'})
+        return "Ошибка: Ссылка пустая", 400
 
-    # Сначала скачиваем видео на сервер (ваш компьютер)
-    result = download_tiktok_video(tiktok_url)
+    # Скачиваем
+    success = download_video(tiktok_url)
     
-    if result['status'] == 'success':
-        # Если скачалось, говорим сайту: "Файл готов, вот ссылка на скачивание с моего ПК"
-        return jsonify({
-            'status': 'success', 
-            'title': result['title'], 
-            'download_url': '/download_file' # Ссылка ведет на наш же сервер
-        })
+    if success and os.path.exists(DOWNLOAD_FILE):
+        # Отдаем файл браузеру напрямую
+        # as_attachment=True заставляет браузер сразу начать скачку, а не открывать видео
+        return send_file(DOWNLOAD_FILE, as_attachment=True, download_name='tiktok_no_watermark.mp4')
     else:
-        return jsonify(result)
-
-# Новый маршрут: отдает скачанный файл пользователю
-@app.route('/download_file')
-def send_video():
-    try:
-        return send_file(DOWNLOAD_FILE, as_attachment=True, download_name='tiktok_video.mp4')
-    except Exception as e:
-        return f"Ошибка при отдаче файла: {str(e)}"
+        return "Не удалось скачать видео. Возможно, приватный профиль или неверная ссылка."
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

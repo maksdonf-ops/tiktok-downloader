@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TikTok Downloader (No Watermark)</title>
+    <title>TikTok Downloader</title>
     <style>
         body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f0f2f5; margin: 0; }
         .container { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
@@ -11,61 +11,21 @@
         input { width: 100%; padding: 12px; margin-bottom: 1rem; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
         button { width: 100%; padding: 12px; background-color: #fe2c55; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         button:hover { background-color: #e6254a; }
-        #result { margin-top: 1.5rem; display: none; }
-        .download-btn { display: inline-block; padding: 10px 20px; background-color: #25f4ee; color: #000; text-decoration: none; border-radius: 6px; font-weight: bold; }
-        .loader { display: none; margin-top: 10px; color: #666; }
+        .note { margin-top: 15px; font-size: 0.8rem; color: #666; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>TikTok Загрузчик</h1>
-    <input type="text" id="urlInput" placeholder="Вставьте ссылку на видео...">
-    <button onclick="processVideo()">Найти видео</button>
+    <h1>Скачать TikTok</h1>
     
-    <div class="loader" id="loader">Обработка...</div>
-    
-    <div id="result">
-        <p id="videoTitle"></p>
-        <a id="downloadLink" href="#" target="_blank" rel="noreferrer" class="download-btn">Скачать Видео</a>
-    </div>
+    <form action="/download" method="POST">
+        <input type="text" name="url" placeholder="Вставьте ссылку..." required>
+        <button type="submit">Скачать Видео</button>
+    </form>
+
+    <p class="note">После нажатия подождите 5-10 секунд, пока видео загрузится.</p>
 </div>
-
-<script>
-    async function processVideo() {
-        const url = document.getElementById('urlInput').value;
-        const loader = document.getElementById('loader');
-        const resultDiv = document.getElementById('result');
-        
-        if(!url) return alert("Введите ссылку!");
-
-        loader.style.display = 'block';
-        resultDiv.style.display = 'none';
-
-        try {
-            const response = await fetch('/api/process', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url: url })
-            });
-            
-            const data = await response.json();
-            
-            if (data.status === 'success') {
-                document.getElementById('videoTitle').innerText = data.title;
-                const link = document.getElementById('downloadLink');
-                link.href = data.download_url;
-                resultDiv.style.display = 'block';
-            } else {
-                alert("Ошибка: " + data.message);
-            }
-        } catch (error) {
-            alert("Произошла ошибка сервера");
-        } finally {
-            loader.style.display = 'none';
-        }
-    }
-</script>
 
 </body>
 </html>
